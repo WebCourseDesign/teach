@@ -56,7 +56,8 @@
           <el-aside style="width: 150px; height: 100%">
             <el-scrollbar class="scrollar animate-fade">
               <el-menu background-color="#409EFF" text-color="#ffffff" active-text-color="#ffd04b"
-                :default-active="activeMenu" :default-openeds="openMenus" class="el-menu-vertical-demo" router>
+                :default-active="activeMenu" :default-openeds="openMenus" class="el-menu-vertical-demo" router
+                @open="handleOpen" @close="handleClose">
                 <!-- 动态生成一级菜单和二级菜单 -->
                 <template v-for="(v, i) in systemConfig.naviList" :key="i">
                   <!-- 如果该一级菜单有子菜单 -->
@@ -118,7 +119,7 @@ export default defineComponent({
   // templte中使用的数据
   data: () => ({
     activeMenu: "/MainPage",
-    openMenus: [] as string[],
+    openMenus: JSON.parse(localStorage.getItem('openMenus') || '[]') as string[], // 修改这行
     isCollapse: false,
     leList: [] as MenuInfo[],
     funId: "",
@@ -137,24 +138,26 @@ export default defineComponent({
       }, 1000);
     }
     const store = useAppStore();
-    if (
-      store.userInfo.username &&
-      store.userInfo.username.length > 0 &&
-      store.systemConfig.showLeftMeun
-    ) {
-      if (store.userInfo.roles == "ROLE_STUDENT") {
-        router.push({ path: "/StudentMainPage" });
-        const res = getStudentInfo(store.$state.userInfo.id - 1);
-
+    // 只在首次加载时进行重定向，而不是每次刷新都重定向
+    if (!sessionStorage.getItem('initialLoadDone')) {
+      if (
+        store.userInfo.username &&
+        store.userInfo.username.length > 0 &&
+        store.systemConfig.showLeftMeun
+      ) {
+        if (store.userInfo.roles == "ROLE_STUDENT") {
+          router.push({ path: "/StudentMainPage" });
+          const res = getStudentInfo(store.$state.userInfo.id - 1);
+        }
+        else if (store.userInfo.roles == "ROLE_TEACHER") {
+          router.push({ path: "/TeacherMainPage" });
+        }
+        else router.push({ path: "/MainPage" });
+      } else {
+        router.push({ path: "/Login" });
       }
-      else if (store.userInfo.roles == "ROLE_TEACHER") {
-        router.push({ path: "/TeacherMainPage" });
-      }
-      else router.push({ path: "/MainPage" });
-    } else {
-      router.push({ path: "/Login" });
+      sessionStorage.setItem('initialLoadDone', 'true');
     }
-
   },
 
   // 生命周期函数  unmounted() 在实例销毁之后调用，清除定期刷新控制台时间
@@ -165,6 +168,15 @@ export default defineComponent({
   computed: {
     ...mapState(useAppStore, ["systemConfig"]),
     ...mapState(useAppStore, ["userInfo"]),
+  },
+  watch: {
+    // 添加这个watch
+    openMenus: {
+      handler(newVal) {
+        localStorage.setItem('openMenus', JSON.stringify(newVal));
+      },
+      deep: true
+    }
   },
   methods: {
     handleCommand(command) {
@@ -221,9 +233,22 @@ export default defineComponent({
       return false
     },
     refreshPage() {
-      location.reload();
-    }
+      localStorage.setItem('openMenus', JSON.stringify(this.openMenus));
+      window.location.reload();
+    },
+    // 添加菜单展开/收起处理方法
+    handleOpen(key: string) {
+      if (!this.openMenus.includes(key)) {
+        this.openMenus.push(key);
+      }
+    },
 
+    handleClose(key: string) {
+      const index = this.openMenus.indexOf(key);
+      if (index > -1) {
+        this.openMenus.splice(index, 1);
+      }
+    }
   },
 });
 </script>
