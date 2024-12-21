@@ -158,13 +158,13 @@ onMounted(async () => {
                 username: appStore.$state.userInfo.username,
             })
             studentInfo.value = studentRes.data;
-            console.log(studentRes)
-            console.log(studentInfo.value.personId)
+            //console.log(studentRes)
+            //console.log(studentInfo.value.personId)
             if (studentInfo.value.personId) {
                 const photoRes = await getPhotoImageStr(studentInfo.value.personId + '.jpg')
                 imgStr.value = photoRes.data // 使用 .value 赋值
                 imgStr.value = imgStr.value.replace('data:image/png;base64', 'data:image/jpeg;base64')
-                console.log(imgStr.value)
+                //console.log(imgStr.value)
             }
         }
 

@@ -19,9 +19,7 @@
           <div class="right-content animate-fade">
             <el-dropdown @command="handleCommand">
               <div style="display:flex; align-items: center;">
-                <img class="icon1" referrerpolicy="no-referrer"
-                  src="https://lanhu.oss-cn-beijing.aliyuncs.com/SketchPngcaa325ea059ecab33bd0e7b025f2ac5dda130ce8e86127c93834c53cb5716514"
-                  alt="Profile" />
+                <img class="icon1" referrerpolicy="no-referrer" :src="imgStr1 || defaultAvatar" alt="Profile" />
                 <span class="info" style="margin-left: 10px;color: aliceblue;">
                   {{ userInfo.perName }}({{ userInfo.username }})
                 </span>
@@ -105,16 +103,22 @@
 <script lang="ts">
 // 引入使用的组件、函数和数据接口
 import { mapState } from "pinia";
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import { useAppStore } from "~/stores/app";
 import router from "~/router";
 import { type MenuInfo } from "~/models/general";
 import { formatTime } from "~/tools/comMethod";
 import { getStudentInfo } from "~/services/personServ";
+import { generalRequest } from "~/services/genServ";
+import { getPhotoImageStr } from "~/services/infoServ";
 // vue3中新增了 defineComponent ，它并没有实现任何的逻辑，只是把接收的 Object 直接返回，它的存在就是完全为了服务 TypeScript 而存在的。
 // 我都知道普通的组件就是一个普通的对象，既然是一个普通的对象，那自然就不会获得自动的提示，
 
+const info = ref();
+const imgStr = ref();
+
 export default defineComponent({
+
 
   // templte中使用的数据
   data: () => ({
@@ -126,10 +130,12 @@ export default defineComponent({
     showLeftList: true,
     timer: null as any,
     currentTime: formatTime(new Date()),
-    appStore: useAppStore()
+    appStore: useAppStore(),
+    defaultAvatar: '/user.png',
+    imgStr1: imgStr
   }),
   //生命周期函数  mounted() 在实例挂载之后调用， 设置定期刷新控制台时间
-  mounted() {
+  async mounted() {
     if (this.timer) {
       clearInterval(this.timer);
     } else {
@@ -138,6 +144,7 @@ export default defineComponent({
       }, 1000);
     }
     const store = useAppStore();
+
     // 只在首次加载时进行重定向，而不是每次刷新都重定向
     if (!sessionStorage.getItem('initialLoadDone')) {
       if (
@@ -145,6 +152,7 @@ export default defineComponent({
         store.userInfo.username.length > 0 &&
         store.systemConfig.showLeftMeun
       ) {
+
         if (store.userInfo.roles == "ROLE_STUDENT") {
           router.push({ path: "/StudentMainPage" });
           const res = getStudentInfo(store.$state.userInfo.id - 1);
@@ -157,6 +165,18 @@ export default defineComponent({
         router.push({ path: "/Login" });
       }
       sessionStorage.setItem('initialLoadDone', 'true');
+
+      const res = await generalRequest("/api/base/getByUsername", {
+        username: store.$state.userInfo.username,
+      })
+      info.value = res.data;
+      console.log("mark1" + info.value)
+      if (info.value.personId) {
+        const photoRes = await getPhotoImageStr(info.value.personId + '.jpg')
+        imgStr.value = photoRes.data // 使用 .value 赋值
+        if (imgStr.value != null) imgStr.value = imgStr.value.replace('data:image/png;base64', 'data:image/jpeg;base64')
+      }
+
     }
   },
 
@@ -176,6 +196,23 @@ export default defineComponent({
         localStorage.setItem('openMenus', JSON.stringify(newVal));
       },
       deep: true
+    },
+    userInfo: {
+      async handler(newVal, oldVal) {
+        const store = useAppStore();
+        const res = await generalRequest("/api/base/getByUsername", {
+          username: store.$state.userInfo.username,
+        })
+        info.value = res.data;
+        console.log("mark1" + info.value)
+        if (info.value.personId) {
+          const photoRes = await getPhotoImageStr(info.value.personId + '.jpg')
+          imgStr.value = photoRes.data // 使用 .value 赋值
+          if (imgStr.value != null) imgStr.value = imgStr.value.replace('data:image/png;base64', 'data:image/jpeg;base64')
+        }
+
+      },
+      deep: true
     }
   },
   methods: {
@@ -190,6 +227,7 @@ export default defineComponent({
     },
     // 退出登录
     logout() {
+      imgStr.value = null;
       const store = useAppStore();
       store.logout();
       router.push({ path: "/Login" });
@@ -232,9 +270,15 @@ export default defineComponent({
       }
       return false
     },
-    refreshPage() {
+
+    async refreshPage() {
+      console.log("刷新页面")
+
+
+
       localStorage.setItem('openMenus', JSON.stringify(this.openMenus));
       window.location.reload();
+
     },
     // 添加菜单展开/收起处理方法
     handleOpen(key: string) {

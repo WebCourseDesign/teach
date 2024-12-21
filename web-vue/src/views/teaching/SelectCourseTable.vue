@@ -2,9 +2,12 @@
     <div>
         <el-form :inline="true" v-if="appStore.$state.userInfo.roles.includes('ROLE_STUDENT')"
             :disabled="isSelect == 0">
-            <el-form-item label="课程列表">
+            <el-form-item label="课程列表" v-if="isSelect == 1">
                 <el-cascader v-model="selectCourse" :options="cListOptions" :props="props" clearable
                     style="width: 400px;" collapse-tags collapse-tags-tooltip show-all-levels="false" />
+            </el-form-item>
+            <el-form-item v-else>
+                <el-text>选课暂未开放，请等待管理员操作</el-text>
             </el-form-item>
             <el-form-item>
                 <el-button @click="submitList">选课</el-button>
