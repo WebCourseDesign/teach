@@ -11,18 +11,19 @@
                 <template #header>
                     <div class="card-header">
                         <span>教师信息</span>
-                        <el-button text @click="$router.push('/TeacherInfo')">编辑</el-button>
+                        <el-button text @click="triggerFileInput()">上传头像</el-button>
                     </div>
                 </template>
                 <div class="teacher-info" v-if="teacherInfo">
+                  <input type="file" id="file" accept="image/jpeg" style="display: none;" @change="uploadFile" />
                     <img :src="imgStr || '/user.png'" class="avatar" alt="avatar" />
                     <div class="info-details">
-                        <p><b>工号:</b> {{ teacherInfo.person?.num }}</p>
-                        <p><b>姓名:</b> {{ teacherInfo.person?.name }}</p>
-                        <p><b>学院:</b> {{ teacherInfo.person?.dept }}</p>
-                        <p><b>职称:</b> {{ teacherInfo.title }}</p>
-                        <p><b>学位:</b> {{ teacherInfo.degree }}</p>
-                        <p><b>邮箱:</b> {{ teacherInfo.person?.email }}</p>
+                        <p><b>工号:</b> {{ teacherInfo?.num }}</p>
+                        <p><b>姓名:</b> {{ teacherInfo?.name }}</p>
+                        <p><b>学院:</b> {{ teacherInfo?.dept }}</p>
+                        <p><b>职称:</b> {{ teacherInfo?.title }}</p>
+                        <p><b>学位:</b> {{ teacherInfo?.degree }}</p>
+                        <p><b>邮箱:</b> {{ teacherInfo?.email }}</p>
                     </div>
                 </div>
             </el-card>
@@ -38,10 +39,11 @@
                 <div class="course-list">
                     <el-empty v-if="!courses.length" description="暂无课程" />
                     <div v-else class="course-items">
-                        <div v-for="course in courses" :key="course.courseId" class="course-item">
-                            <h4>{{ course.name }}</h4>
-                            <p>课程编号: {{ course.num }}</p>
-                            <p>学分: {{ course.credit }}</p>
+                        <div v-for="course in courses" :key="course.courseId">
+                            <span>{{ course.name }}</span>
+                            <br/>
+                            <span> 课程号: {{ course.num }}</span>
+                            <span> 学分: {{ course.credit }}</span>
                         </div>
                     </div>
                 </div>
@@ -67,32 +69,61 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { getTeacherInfo } from '~/services/personServ'
-import { getCourseList } from '~/services/teachingServ'
-import { getPhotoImageStr } from '~/services/infoServ'
+import {getCourseByTeacher, getCourseItemOptionListByTeacher, getCourseList} from '~/services/teachingServ'
+import {getPhotoImageStr, uploadPhoto} from '~/services/infoServ'
 import { useAppStore } from '~/stores/app'
+import {generalRequest} from "~/services/genServ";
+import {message} from "~/tools/messageBox";
+import {ElMessage} from "element-plus";
+import {CourseItem} from "~/models/general";
 
 const teacherInfo = ref()
 const imgStr = ref('')
-const courses = ref([])
+const course2 = ref()
+const courses = ref<CourseItem[]>([])
 const appStore = useAppStore()
-
+const triggerFileInput = () => {
+  const fileInput = document.querySelector('#file') as HTMLInputElement
+  if (fileInput) {
+    fileInput.click()
+  }
+}
+const uploadFile = async () => {
+  const fileInput = document.querySelector('#file') as HTMLInputElement;
+  if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+    ElMessage.error('请选择文件');
+    return;
+  }
+  const file = fileInput.files[0];
+  if (file.type != 'image/jpeg') {
+    ElMessage.error('只能上传图片格式的文件')
+    return
+  }
+  const res = await uploadPhoto(teacherInfo.value.personId+".jpg", file);
+  if (res.code === 0) {
+    ElMessage.success('上传成功');
+    const result = await getPhotoImageStr(teacherInfo.value.personId+".jpg");
+    imgStr.value = result.data;
+  } else {
+    ElMessage.error('上传失败');
+  }
+};
 onMounted(async () => {
     try {
         // 获取教师信息
-        if (appStore.$state.userInfo.teacherId) {
-            const teacherRes = await getTeacherInfo(appStore.$state.userInfo.teacherId)
-            teacherInfo.value = teacherRes
-            if (teacherInfo.value?.person?.personId) {
-                const photoRes = await getPhotoImageStr(teacherInfo.value.person.personId + '.jpg')
-                imgStr.value = photoRes.data
-            }
+        if (appStore.$state.userInfo.username) {
+          const teacherRes = await generalRequest("/api/base/getByUsername", {username: appStore.$state.userInfo.username});
+          console.log(teacherRes)
+          teacherInfo.value = teacherRes.data
+          if (teacherInfo.value.personId) {
+            const photoRes = await getPhotoImageStr(teacherInfo.value.personId + '.jpg')
+            imgStr.value = photoRes.data
+            imgStr.value = imgStr.value.replace('data:image/png;base64', 'data:image/jpeg;base64')
+          }
         }
-
         // 获取教师课程列表
-        const courseRes = await getCourseList()
-        courses.value = courseRes.filter(c =>
-            c.teacher?.teacherId === appStore.$state.userInfo.teacherId
-        )
+        const courseList = await getCourseByTeacher();
+        courses.value = courseList.data.data;
     } catch (error) {
         console.error('Error loading teacher dashboard:', error)
     }

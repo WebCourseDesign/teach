@@ -221,6 +221,7 @@ public class CourseController {
         Person person = userRepository.findById(userId).get().getPerson();
         Teacher teacher = teacherRepository.getTeacherByPerson(person);
         List<Course> cList = courseRepository.findByTeacher(teacher);
+        System.out.println(cList);
         return CommonMethod.getReturnData(cList);
     }
 
