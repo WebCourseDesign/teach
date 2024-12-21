@@ -123,7 +123,7 @@ export default defineComponent({
   // templte中使用的数据
   data: () => ({
     activeMenu: "/MainPage",
-    openMenus: JSON.parse(localStorage.getItem('openMenus') || '[]') as string[], // 修改这行
+    openMenus: JSON.parse(localStorage.getItem('openMenus') || '[]') as string[],
     isCollapse: false,
     leList: [] as MenuInfo[],
     funId: "",
@@ -228,6 +228,7 @@ export default defineComponent({
     // 退出登录
     logout() {
       imgStr.value = null;
+      localStorage.setItem('openMenus', '[]');
       const store = useAppStore();
       store.logout();
       router.push({ path: "/Login" });
@@ -273,8 +274,6 @@ export default defineComponent({
 
     async refreshPage() {
       console.log("刷新页面")
-
-
 
       localStorage.setItem('openMenus', JSON.stringify(this.openMenus));
       window.location.reload();

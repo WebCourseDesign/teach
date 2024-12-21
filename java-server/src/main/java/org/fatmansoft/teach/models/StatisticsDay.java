@@ -3,12 +3,11 @@ package org.fatmansoft.teach.models;
 import javax.persistence.*;
 
 @Entity
-@Table(	name = "statistics_day",
-        uniqueConstraints = {
-        })
+@Table(name = "statistics_day", uniqueConstraints = {
+})
 public class StatisticsDay {
     @Id
-    private String  day;
+    private String day;
     private Integer loginCount;
     private Integer requestCount;
     private Integer createCount;

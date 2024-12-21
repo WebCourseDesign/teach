@@ -4,57 +4,45 @@
       <div class="blue_column"></div>
       <div class="base_title">系统主页</div>
     </div>
-    <!-- 主页面的四个区域 -->
-    <div class="upPart">
-      <!-- 左上角区 活跃用户-->
-      <div class="main-one">
-        <div class="main-center">
-          <div class="header">活跃用户</div>
-          <div class="image"><img class="imageOne" src="/user.png" /></div>
-        </div>
-        <div class="bottom" />
-        <div class="pieChart">
-          <div id="onlineUserChart" class="chart-container" />
-        </div>
-      </div>
-      <!-- 右上角区 用户分类-->
-      <div class="main-two">
-        <div class="main-center">
-          <div class="headerTwo">用户分类</div>
-          <div class="image"><img class="imageOne" src="/user.png" /></div>
-        </div>
-        <div class="bottomtwo" />
-        <div class="pieChart">
-          <div id="userTypeChart" class="chart-container" />
-        </div>
-      </div>
+
+    <div class="dashboard-container">
+      <!-- 活跃用户卡片 -->
+      <el-card class="chart-card">
+        <template #header>
+          <div class="card-header">
+            <span>用户活跃度分析</span>
+          </div>
+        </template>
+        <div id="onlineUserChart" class="chart-container"></div>
+      </el-card>
+
+      <!-- 用户分类卡片 -->
+      <el-card class="chart-card">
+        <template #header>
+          <div class="card-header">
+            <span>用户角色分布</span>
+          </div>
+        </template>
+        <div id="userTypeChart" class="chart-container"></div>
+      </el-card>
     </div>
-    <div class="downPart">
-      <!-- 左下角区 服务请求-->
-      <div class="main-three">
-        <div class="main-center">
-          <div class="header3">服务请求</div>
-          <div class="image"><img class="imageOne" src="/dayOrder.png" /></div>
+    <div class="dashboard-container">
+      <!-- 快速入口 -->
+      <el-card class="quick-access">
+        <template #header>
+          <div class="card-header">
+            <span>快速入口</span>
+          </div>
+        </template>
+        <div class="button-group">
+
         </div>
-        <div class="bottom3" />
-        <div class="pieChart">
-          <div id="requestChart" style="width: 600px; height: 350px" />
-        </div>
-      </div>
-      <!-- 右下角区 数据操作-->
-      <div class="main-four">
-        <div class="main-center">
-          <div class="header4">数据操作</div>
-          <div class="image"><img class="imageOne" src="/dayOrder.png" /></div>
-        </div>
-        <div class="bottom4" />
-        <div class="pieChart">
-          <div id="operateChart" style="width: 600px; height: 350px" />
-        </div>
-      </div>
+      </el-card>
     </div>
+
   </div>
 </template>
+
 <script lang="ts">
 import { defineComponent } from "vue";
 import * as echarts from "echarts";
@@ -64,7 +52,6 @@ var echart = echarts;
 var onlineUserChart: any;
 var userTypeChart: any;
 var requestChart: any;
-var operateChart: any;
 
 export default defineComponent({
   //数据
@@ -72,7 +59,7 @@ export default defineComponent({
     onlineUser: {} as UserOnlineItem,
     userTypeList: [],
     requestData: {} as ChartItem,
-    operateData: {} as ChartItem,
+    timeRange: 'day',
   }),
   async created() {
     await this.doQuery();
@@ -90,7 +77,6 @@ export default defineComponent({
       this.onlineUser = res.data.onlineUser;
       this.userTypeList = res.data.userTypeList;
       this.requestData = res.data.requestData;
-      this.operateData = res.data.operateData;
 
       this.drawEcharts();
     },
@@ -118,18 +104,11 @@ export default defineComponent({
       ) {
         requestChart.dispose(); //解决echarts dom已经加载的报错
       }
-      if (
-        operateChart != null &&
-        operateChart != "" &&
-        operateChart != undefined
-      ) {
-        operateChart.dispose(); //解决echarts dom已经加载的报错
-      }
       onlineUserChart = echart.init(
         document.getElementById("onlineUserChart") as any
       );
       onlineUserChart.setOption({
-        title: { text: "用户活跃情况", left: "center" },
+        title: { text: "用户活跃度分析", left: "center" },
         xAxis: {
           type: "value",
         },
@@ -138,6 +117,7 @@ export default defineComponent({
           axisPointer: {
             type: "shadow",
           },
+          formatter: '{b}: {c}人'
         },
         grid: {
           left: "3%",
@@ -195,193 +175,115 @@ export default defineComponent({
         document.getElementById("userTypeChart") as any
       );
       userTypeChart.setOption({
-        title: { text: "用户总数:" + this.onlineUser.total, left: "center" },
+        title: {
+          text: "用户角色分布",
+          subtext: `总用户数: ${this.onlineUser.total}人`,
+          left: "center"
+        },
         tooltip: {
           trigger: "item",
-          formatter: "{a} <br/>{b}:  ({d}%)",
+          formatter: "{b}: {c}人 ({d}%)"
         },
         legend: {
-          top: "bottom",
+          bottom: 10,
+          left: 'center'
         },
-
-        series: [
-          {
-            itemStyle: {
-              borderRadius: this.userTypeList.length,
-              label: {
-                show: true,
-                formatter: "{b} : {c} ",
-              },
-              labelLine: { show: true },
-            },
-
-            name: "当天",
-            type: "pie",
-            radius: [25, 120],
-            center: ["50%", "50%"],
-            roseType: "area",
-
-            data: this.userTypeList,
+        series: [{
+          name: "用户角色",
+          type: "pie",
+          radius: ['40%', '70%'],
+          avoidLabelOverlap: false,
+          itemStyle: {
+            borderRadius: 10,
+            borderColor: '#fff',
+            borderWidth: 2
           },
-        ],
+          label: {
+            show: true,
+            formatter: '{b}: {c}人'
+          },
+          emphasis: {
+            label: {
+              show: true,
+              fontSize: '16',
+              fontWeight: 'bold'
+            }
+          },
+          data: this.userTypeList
+        }]
       });
       //绘制请求图表
       requestChart = echart.init(
         document.getElementById("requestChart") as any
       );
       requestChart.setOption({
-        xAxis: {
-          type: "category",
-          axisTick: {
-            alignWithLabel: true,
-          },
-          data: this.requestData.value,
-        },
-        legend: {},
+        title: { text: "系统访问趋势", left: "center" },
         tooltip: {
           trigger: "axis",
-          axisPointer: {
-            type: "shadow",
-          },
+          axisPointer: { type: "line" }
         },
-        grid: {
-          left: "3%",
-          right: "4%",
-          bottom: "3%",
-          containLabel: true,
+        xAxis: {
+          type: "category",
+          boundaryGap: false,
+          data: this.requestData.value
         },
         yAxis: {
           type: "value",
+          splitLine: { show: false }
         },
-        series: [
-          {
-            name: "登录",
-            type: "bar",
-            stack: "total",
-            emphasis: {
-              focus: "series",
-            },
-            itemStyle: {
-              color: "#1296db",
-              label: {
-                show: true, //开启显示
-                textStyle: {
-                  //数值样式
-                  color: "black",
-                  fontSize: 7,
-                },
-              },
-            },
-            data: this.requestData.label1,
+        series: [{
+          name: "访问量",
+          type: "line",
+          smooth: true,
+          lineStyle: {
+            width: 3,
+            shadowColor: 'rgba(0,0,0,0.3)',
+            shadowBlur: 10,
+            shadowOffsetY: 8
           },
-          {
-            name: "请求",
-            type: "bar",
-            stack: "total",
-            emphasis: {
-              focus: "series",
-            },
-            itemStyle: {
-              color: "#1296db",
-              label: {
-                show: true, //开启显示
-                textStyle: {
-                  //数值样式
-                  color: "black",
-                  fontSize: 7,
-                },
-              },
-            },
-            data: this.requestData.label2,
+          areaStyle: {
+            opacity: 0.3,
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+              offset: 0,
+              color: 'rgb(128, 255, 165)'
+            }, {
+              offset: 1,
+              color: 'rgb(1, 191, 236)'
+            }])
           },
-        ],
-      });
-      // 绘制修改数据图表
-      operateChart = echart.init(
-        document.getElementById("operateChart") as any
-      );
-      operateChart.setOption({
-        xAxis: {
-          type: "category",
-          axisTick: {
-            alignWithLabel: true,
-          },
-          data: this.operateData.value,
-        },
-        legend: {},
-        tooltip: {
-          trigger: "axis",
-          axisPointer: {
-            type: "shadow",
-          },
-        },
-        grid: {
-          left: "3%",
-          right: "4%",
-          bottom: "3%",
-          containLabel: true,
-        },
-        yAxis: {
-          type: "value",
-        },
-        series: [
-          {
-            name: "新建",
-            type: "bar",
-            stack: "total",
-            emphasis: {
-              focus: "series",
-            },
-            itemStyle: {
-              color: "#1296db",
-              label: {
-                show: true, //开启显示
-                textStyle: {
-                  //数值样式
-                  color: "black",
-                  fontSize: 7,
-                },
-              },
-            },
-            data: this.operateData.label1,
-          },
-          {
-            name: "修改",
-            type: "bar",
-            stack: "total",
-            emphasis: {
-              focus: "series",
-            },
-            itemStyle: {
-              color: "#1296db",
-              label: {
-                show: true, //开启显示
-                textStyle: {
-                  //数值样式
-                  color: "black",
-                  fontSize: 7,
-                },
-              },
-            },
-            data: this.operateData.label2,
-          },
-        ],
+          data: this.requestData.label1
+        }]
       });
     },
     handleResize() {
       onlineUserChart?.resize();
       userTypeChart?.resize();
       requestChart?.resize();
-      operateChart?.resize();
-    }
+    },
+    handleTimeRangeChange() {
+      // 这里添加切换时间范围的逻辑
+      this.doQuery();
+    },
   },
 });
 </script>
+
 <style scoped>
-.pieChart {
-  width: 100%;
-  height: 280px;
-  margin: 0px auto;
+.dashboard-container {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 20px;
+}
+
+.chart-card {
+  height: 100%;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .chart-container {
@@ -389,141 +291,21 @@ export default defineComponent({
   height: 350px !important;
 }
 
-.upPart,
-.downPart {
-  display: flex;
-  flex-direction: row;
-  margin-top: 10px;
-  flex-wrap: wrap;
-  gap: 20px;
-  padding: 0 20px;
-}
-
-.main-one,
-.main-two,
-.main-three,
-.main-four {
-  background: white;
-  flex: 1;
-  min-width: 300px;
-  height: auto;
-  margin: 0;
-}
-
-/* 响应式布局断点 */
 @media screen and (max-width: 768px) {
-
-  .upPart,
-  .downPart {
-    flex-direction: column;
+  .dashboard-container {
+    grid-template-columns: 1fr;
   }
 
-  .main-one,
-  .main-two,
-  .main-three,
-  .main-four {
-    width: 100%;
-    margin: 10px 0;
-  }
-
-  .header,
-  .headerTwo,
-  .header3,
-  .header4 {
-    font-size: 16px;
-  }
-
-  .imageOne {
-    width: 30px;
-    height: 30px;
+  .chart-container {
+    height: 300px !important;
   }
 }
 
-@media screen and (min-width: 769px) and (max-width: 1024px) {
-
-  .main-one,
-  .main-two,
-  .main-three,
-  .main-four {
-    min-width: 45%;
-  }
+.full-width {
+  grid-column: 1 / -1;
 }
 
-.header {
-  margin-top: 20px;
-  margin-left: 40px;
-  font-size: 20px;
-  color: #3cb371;
-  font-weight: bold;
-}
-
-.header3 {
-  margin-top: 20px;
-  margin-left: 40px;
-  font-size: 20px;
-  color: #d4237a;
-  font-weight: bold;
-}
-
-.header4 {
-  margin-top: 20px;
-  margin-left: 40px;
-  font-size: 20px;
-  color: #1296db;
-  font-weight: bold;
-}
-
-.headerTwo {
-  margin-top: 20px;
-  margin-left: 40px;
-  font-size: 20px;
-  color: #ffa500;
-  font-weight: bold;
-}
-
-.bottom {
-  background: #3cb371;
-  height: 2px;
-  width: 100%;
-  margin-top: 10px;
-}
-
-.bottom3 {
-  background: #d4237a;
-  height: 2px;
-  width: 100%;
-  margin-top: 10px;
-}
-
-.bottom4 {
-  background: #1296db;
-  height: 2px;
-  width: 100%;
-  margin-top: 10px;
-}
-
-.bottomtwo {
-  background: #ffa500;
-  height: 2px;
-  width: 100%;
-  margin-top: 10px;
-}
-
-.imageOne {
-  width: 40px;
-  height: 40px;
-}
-
-.main-center {
-  display: flex;
-  flex-direction: row;
-}
-
-.image {
-  width: 40px;
-  height: 40px;
-  margin-left: auto;
-  margin-top: 10px;
-  margin-right: 20px;
+.el-radio-group {
+  margin-left: 20px;
 }
 </style>

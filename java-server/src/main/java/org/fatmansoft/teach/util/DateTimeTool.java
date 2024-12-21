@@ -11,8 +11,9 @@ import java.util.Date;
 public class DateTimeTool {
     /**
      * formatDateTime 字串串转换日期
+     * 
      * @param timeSrc
-     * @param f "yyyy-MM-dd"
+     * @param f       "yyyy-MM-dd"
      * @return
      */
     public static Date formatDateTime(String timeSrc, String f) {
@@ -26,19 +27,20 @@ public class DateTimeTool {
             return tmpDate;
         } catch (ParseException e) {
             // TODO Auto-generated catch block
-//			e.printStackTrace();
+            // e.printStackTrace();
             return null;
         }
     }
 
     /**
-     *   parseDateTime 日期转换字符串
+     * parseDateTime 日期转换字符串
+     * 
      * @param timeSrc
      * @param f
      * @return
      */
     public static String parseDateTime(Date timeSrc) {
-        return parseDateTime(timeSrc,"yyyy-MM-dd HH:mm:ss");
+        return parseDateTime(timeSrc, "yyyy-MM-dd HH:mm:ss");
     }
 
     public static String parseDateTime(Date timeSrc, String f) {
@@ -54,6 +56,7 @@ public class DateTimeTool {
 
     /**
      * nextDay 后一天日期
+     * 
      * @param date
      * @return
      */
@@ -69,13 +72,14 @@ public class DateTimeTool {
 
     /**
      * nextDay 后n天日期
+     * 
      * @param date
      * @param num
      * @return
      */
     public static Date nextDay(Date date, int num) {
         if (date != null) {
-            if(num == 0)
+            if (num == 0)
                 return date;
             Calendar c1 = Calendar.getInstance();
             c1.setTime(date);
@@ -87,6 +91,7 @@ public class DateTimeTool {
 
     /**
      * prevDay 前一天日期
+     * 
      * @param date
      * @return
      */
@@ -103,6 +108,7 @@ public class DateTimeTool {
 
     /**
      * prevDay 前n天日期
+     * 
      * @param date
      * @param n
      * @return
@@ -119,6 +125,7 @@ public class DateTimeTool {
 
     /**
      * nextWeek 下一周日期
+     * 
      * @param date
      * @return
      */
@@ -133,7 +140,8 @@ public class DateTimeTool {
     }
 
     /**
-     *  其一周日期
+     * 其一周日期
+     * 
      * @param date
      * @return
      */
@@ -149,6 +157,7 @@ public class DateTimeTool {
 
     /**
      * nextMonth 下一月日期
+     * 
      * @param date
      * @return
      */
@@ -164,11 +173,12 @@ public class DateTimeTool {
 
     /**
      * nextMonth 获得后n个月日期
+     * 
      * @param date
      * @param n
      * @return
      */
-    public static Date nextMonth(Date date,int n) {
+    public static Date nextMonth(Date date, int n) {
         if (date != null) {
             Calendar c1 = Calendar.getInstance();
             c1.setTime(date);
@@ -180,6 +190,7 @@ public class DateTimeTool {
 
     /**
      * prevMonth 获得前一月的日期
+     * 
      * @param date
      * @return
      */
@@ -195,6 +206,7 @@ public class DateTimeTool {
 
     /**
      * prevMonth 获得前n个月的日期
+     * 
      * @param date
      * @param n
      * @return
@@ -211,11 +223,12 @@ public class DateTimeTool {
 
     /**
      * nextYear 获得后n年的日期
+     * 
      * @param date
      * @param n
      * @return
      */
-    public static Date nextYear(Date date,int n) {
+    public static Date nextYear(Date date, int n) {
         if (date != null) {
             Calendar c1 = Calendar.getInstance();
             c1.setTime(date);
@@ -227,6 +240,7 @@ public class DateTimeTool {
 
     /**
      * prevYear 获得前一年的日期
+     * 
      * @param date
      * @return
      */
@@ -242,18 +256,19 @@ public class DateTimeTool {
 
     /**
      * getCurrentWeekDay 获得当前的星期几
+     * 
      * @return
      */
-    public static int getCurrentWeekDay(){
+    public static int getCurrentWeekDay() {
         Calendar cal = Calendar.getInstance();
         Date date = new Date();
-        date= nextDay(date);
-        date= nextDay(date);
+        date = nextDay(date);
+        date = nextDay(date);
         cal.setTime(date);
         return cal.get(Calendar.DAY_OF_WEEK);
     }
 
-    public static void main(String args[]){
+    public static void main(String args[]) {
         System.out.println(getCurrentWeekDay());
 
     }
