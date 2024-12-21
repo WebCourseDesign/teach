@@ -39,14 +39,14 @@
                 <div class="course-list">
                     <el-empty v-if="!courses.length" description="暂无课程" />
                     <div v-else class="course-items">
-                        <div v-for="(course, index) in courses.slice(0, 4)" :key="course.courseId">
+                        <div v-for="(course, index) in courses.slice(0, 3)" :key="course.courseId" class="course-item">
                             <span>{{ course.name }}</span>
                             <br />
                             <span> 课程号: {{ course.num }}</span>
                             <span> 学分: {{ course.credit }}</span>
                         </div>
                         <div v-if="courses.length > 4" class="more-courses">
-                            <span @click="$router.push('/course-panel')">...</span>
+                            <button @click="$router.push('/course-panel')">更多</button>
                         </div>
                     </div>
                 </div>
@@ -138,10 +138,10 @@ const uploadFile = async () => {
         return;
     }
     const file = fileInput.files[0];
-    if (file.type != 'image/jpeg') {
+    /* if (file.type != 'image/jpeg') {
         ElMessage.error('只能上传图片格式的文件')
         return
-    }
+    } */
     const res = await uploadPhoto(teacherInfo.value.personId + ".jpg", file);
     if (res.code === 0) {
         ElMessage.success('上传成功');
@@ -186,7 +186,7 @@ onMounted(async () => {
             if (teacherInfo.value.personId) {
                 const photoRes = await getPhotoImageStr(teacherInfo.value.personId + '.jpg')
                 imgStr.value = photoRes.data
-                imgStr.value = imgStr.value.replace('data:image/png;base64', 'data:image/jpeg;base64')
+                if (imgStr != null) imgStr.value = imgStr.value.replace('data:image/png;base64', 'data:image/jpeg;base64')
             }
         }
         // 获取教师课程列表
@@ -226,8 +226,8 @@ onMounted(async () => {
 }
 
 .avatar {
-    width: 120px;
-    height: 120px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     object-fit: cover;
 }

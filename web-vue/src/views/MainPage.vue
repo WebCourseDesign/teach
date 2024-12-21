@@ -35,7 +35,13 @@
           </div>
         </template>
         <div class="button-group">
-
+          <el-button type="warning" @click="$router.push('/course-panel')">课程管理</el-button>
+          <el-button type="primary" @click="$router.push('/score-table-panel')">成绩管理</el-button>
+          <el-button type="success" @click="$router.push('/student-panel')">学生管理</el-button>
+          <el-button type="danger" @click="$router.push('/teacher-panel')">教师管理</el-button>
+          <el-button type="info" @click="$router.push('/daily-activity-panel')">日常活动管理</el-button>
+          <el-button type="warning" @click="$router.push('/honor-panel')">荣誉管理</el-button>
+          <el-button type="primary" @click="$router.push('/innovation-panel')">创新实践管理</el-button>
         </div>
       </el-card>
     </div>

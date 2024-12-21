@@ -79,6 +79,7 @@
                   <template v-else>
                     <el-menu-item :index="'/' + v.id" @click="routerName(v.name)"
                       :class="['menu-item-animate', `delay-${i}`]">
+
                       <i class="el-icon-menu"></i>
                       <span>{{ v.title }}</span>
                     </el-menu-item>
@@ -168,17 +169,19 @@ export default defineComponent({
       }
       sessionStorage.setItem('initialLoadDone', 'true');
 
-      const res = await generalRequest("/api/base/getByUsername", {
-        username: store.$state.userInfo.username,
-      })
-      info.value = res.data;
-      console.log("mark1" + info.value)
-      if (info.value.personId) {
-        const photoRes = await getPhotoImageStr(info.value.personId + '.jpg')
-        imgStr.value = photoRes.data // 使用 .value 赋值
-        if (imgStr.value != null) imgStr.value = imgStr.value.replace('data:image/png;base64', 'data:image/jpeg;base64')
-      }
 
+
+    }
+
+    const res = await generalRequest("/api/base/getByUsername", {
+      username: store.$state.userInfo.username,
+    })
+    info.value = res.data;
+    console.log("mark1" + info.value)
+    if (info.value.personId) {
+      const photoRes = await getPhotoImageStr(info.value.personId + '.jpg')
+      imgStr.value = photoRes.data // 使用 .value 赋值
+      if (imgStr.value != null) imgStr.value = imgStr.value.replace('data:image/png;base64', 'data:image/jpeg;base64')
     }
   },
 
@@ -299,6 +302,10 @@ export default defineComponent({
 </script>
 <!-- 这个是系统主页面的样式，同学可以根据自己的喜好修改 -->
 <style lang="scss" scoped>
+.el-icon-menu {
+  font-size: 20px;
+}
+
 .el-menu-item.is-active {
   background-color: #7a0b10 !important; // Darker shade of primary color
 }

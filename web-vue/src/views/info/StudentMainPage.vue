@@ -163,7 +163,7 @@ onMounted(async () => {
             if (studentInfo.value.personId) {
                 const photoRes = await getPhotoImageStr(studentInfo.value.personId + '.jpg')
                 imgStr.value = photoRes.data // 使用 .value 赋值
-                imgStr.value = imgStr.value.replace('data:image/png;base64', 'data:image/jpeg;base64')
+                if (imgStr.value != null) imgStr.value = imgStr.value.replace('data:image/png;base64', 'data:image/jpeg;base64')
                 //console.log(imgStr.value)
             }
         }
