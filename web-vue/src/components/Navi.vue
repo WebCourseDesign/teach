@@ -11,7 +11,9 @@
 
           <!-- 从正中央移动到左侧 -->
           <div class="logo-container animate-slide">
-            <img src="/logo.png" alt="Logo" class="logo" />
+            <a href="https://www.sdu.edu.cn">
+              <img src="/logo.png" alt="Logo" class="logo" />
+            </a>
             <span class="welcome-text">教学管理系统</span>
           </div>
 
