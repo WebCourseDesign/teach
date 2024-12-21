@@ -1,39 +1,50 @@
 <template>
   <div class="base_form">
-    <div class="base_header">
-      <div class="blue_column"></div>
-      <div class="base_title">课程管理
-        <el-form>
-          <el-form-item label="·是否选课">
-            <el-switch active-text="开始选课" inactive-text="停止选课" :active-value="1" :inactive-value="0" v-model="isSelect"
-              @change="submitChange"></el-switch>
-          </el-form-item>
-        </el-form>
-      </div>
-    </div>
 
-    <div class="base_query_oneLine">
-      <div class="query_left">
-        <el-button class="commButton" type="primary" @click="addItem()">添加</el-button>
-
+    <div v-if="appStore.$state.userInfo.roles.includes('ROLE_ADMIN')">
+      <div class="base_header">
+        <div class="blue_column"></div>
+        <div class="base_title">课程管理
+          <el-form>
+            <el-form-item label="·是否选课">
+              <el-switch active-text="开始选课" inactive-text="停止选课" :active-value="1" :inactive-value="0"
+                v-model="isSelect" @change="submitChange"></el-switch>
+            </el-form-item>
+          </el-form>
+        </div>
       </div>
-      <div class="query_right">
-        <!-- <span style="margin-top: 5px">课程号或课程名</span>
+
+      <div class="base_query_oneLine">
+        <div class="query_left">
+          <el-button class="commButton" type="primary" @click="addItem()">添加</el-button>
+
+        </div>
+        <div class="query_right">
+          <!-- <span style="margin-top: 5px">课程号或课程名</span>
         <input type="text" v-model="numName" style="margin-left: 10px; width: 230px" />
         <button style="margin-left: 5px" class="commButton" @click="query()">查询</button> -->
-        <el-form>
-          <el-form-item label="课程号或课程名">
-            <div class="query_input">
-              <el-input v-model="numName"></el-input>
-              <el-button class="subButton" type="default" @click="query()">查询</el-button>
-            </div>
-          </el-form-item>
-        </el-form>
+          <el-form>
+            <el-form-item label="课程号或课程名">
+              <div class="query_input">
+                <el-input v-model="numName"></el-input>
+                <el-button class="subButton" type="default" @click="query()">查询</el-button>
+              </div>
+            </el-form-item>
+          </el-form>
+        </div>
+      </div>
+      <div style="color: #930e14;text-align: center;font-weight: bold">
+        ps：课序号格式只能为“sduxxxx”，其中x为整数
       </div>
     </div>
-    <div style="color: #930e14;text-align: center;font-weight: bold">
-      ps：课序号格式只能为“sduxxxx”，其中x为整数
+    <div v-else>
+      <div class="base_header">
+        <div class="blue_column"></div>
+        <div class="base_title">课程管理</div>
+      </div>
     </div>
+
+
     <div class="table_center" style="margin-top: 5px">
 
       <el-table :data="courseList" style="width: 100%" label-width="80px">
@@ -41,10 +52,11 @@
         <el-table-column prop="name" label="课程名"></el-table-column>
         <el-table-column prop="credit" label="学分"></el-table-column>
         <el-table-column prop="coursePath" label="教材"></el-table-column>
-        <el-table-column prop="teacher.person.name" label="教师"></el-table-column>
+        <el-table-column prop="teacher.person.name" label="教师"
+          v-if="appStore.$state.userInfo.roles.includes('ROLE_ADMIN')"></el-table-column>
         <el-table-column prop="preCourse.name" label="前序课"></el-table-column>
         <el-table-column prop="maxCount" label="课容量"></el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="操作" v-if="appStore.$state.userInfo.roles.includes('ROLE_ADMIN')">
           <template #default="scope">
             <el-button-group>
               <el-button type="success" @click="editItem(scope.row)">编辑</el-button>
@@ -170,11 +182,15 @@
 <script lang="ts">
 import { type CourseItem, type OptionItem } from '~/models/general'
 import { defineComponent } from 'vue'
-import { getCourseList, courseDelete, courseSave, getTeacherList } from '~/services/teachingServ'
+import { getCourseList, courseDelete, courseSave, getTeacherList, getCourseByTeacher } from '~/services/teachingServ'
 import { message, messageConform } from '~/tools/messageBox'
 import { changeCourse, getSelectState } from '~/services/changeCourseServ';
 import { ElMessage, ElMessageBox } from "element-plus";
 import { cloneDeep } from 'lodash';
+import { useAppStore } from '~/stores/app';
+
+
+
 export default defineComponent({
   // 双向绑定数据
   data: () => ({
@@ -186,7 +202,8 @@ export default defineComponent({
     dialogVisible: false,
     isSelect: 0,
     teacherList: [],
-    tempCourse: {} as CourseItem
+    tempCourse: {} as CourseItem,
+    appStore: useAppStore()
   }),
   //初始加载一次,直接获取教师列表
   created() {
@@ -215,7 +232,12 @@ export default defineComponent({
     },
     //查询课程列表
     async query() {
-      this.courseList = await getCourseList(this.numName)
+      if (this.appStore.$state.userInfo.roles.includes('ROLE_ADMIN')) {
+        this.courseList = await getCourseList(this.numName)
+      } else {
+        this.courseList = (await getCourseByTeacher()).data.data;
+      }
+
 
       this.makeSelectCourseList()
       console.log(this.courseList);

@@ -140,9 +140,9 @@ export interface CourseItem {
   credit: number;
   coursePath: string;
   //preCourse: CourseItem;
-   preCourseId: number;
+  preCourseId: number;
   teacher: TeacherItem;
-  maxCount:0;
+  maxCount: 0;
 }
 //用于成绩数据信息的定义
 export interface ScoreItem {
