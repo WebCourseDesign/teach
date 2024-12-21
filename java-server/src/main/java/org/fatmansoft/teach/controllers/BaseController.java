@@ -91,12 +91,27 @@ public class BaseController {
             else if(op.get().getUserType().getId()==3)
             {
                 Teacher t=teacherRepository.getTeacherByPerson(p);
-                return new DataResponse(0, t,null);
+                return new DataResponse(0, getTeacherMap(t),null);
             }
         }
         return CommonMethod.getReturnMessageError("用户不存在！");
     }
 
+    public Map getTeacherMap(Teacher t){
+        Map m = new HashMap();
+        m.put("teacherId",t.getTeacherId());
+        m.put("title",t.getTitle());
+        m.put("degree",t.getDegree());
+        m.put("personId",t.getPerson().getPersonId());
+        m.put("num",t.getPerson().getNum());
+        m.put("name",t.getPerson().getName());
+        m.put("dept",t.getPerson().getDept());
+        m.put("card",t.getPerson().getCard());
+        m.put("email",t.getPerson().getEmail());
+        m.put("phone",t.getPerson().getPhone());
+        m.put("address",t.getPerson().getAddress());
+        return m;
+    }
 
     /**
      * 获取菜单列表
@@ -505,7 +520,6 @@ public class BaseController {
     }
 
     @PostMapping(value = "/uploadPhotoWeb", consumes = {"multipart/form-data"})
-    @PreAuthorize("hasRole('STUDENT') or hasRole('ADMIN')")
     public DataResponse uploadPhotoWeb(@RequestParam Map pars, @RequestParam("file") MultipartFile file) {
         try {
             String remoteFile = CommonMethod.getString(pars, "remoteFile");

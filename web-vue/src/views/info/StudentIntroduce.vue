@@ -122,6 +122,7 @@ import {
 } from "~/services/infoServ";
 import { message } from "~/tools/messageBox";
 import { exportPerson } from '../../services/studentServ';
+import {ElMessage} from "element-plus";
 const echart = echarts;
 
 export default defineComponent({
@@ -242,6 +243,10 @@ export default defineComponent({
       if (file.files == null || file.files.length == 0) {
         message(this, "请选择文件！");
         return;
+      }
+      if (file.type !== 'image/jpeg') {
+        ElMessage.error('只能上传图片格式的文件')
+        return
       }
       const res = await uploadPhoto(
         this.info.personId + ".jpg",
