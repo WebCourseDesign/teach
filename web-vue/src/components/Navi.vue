@@ -109,6 +109,7 @@ import { useAppStore } from "~/stores/app";
 import router from "~/router";
 import { type MenuInfo } from "~/models/general";
 import { formatTime } from "~/tools/comMethod";
+import { getStudentInfo } from "~/services/personServ";
 // vue3中新增了 defineComponent ，它并没有实现任何的逻辑，只是把接收的 Object 直接返回，它的存在就是完全为了服务 TypeScript 而存在的。
 // 我都知道普通的组件就是一个普通的对象，既然是一个普通的对象，那自然就不会获得自动的提示，
 
@@ -128,7 +129,6 @@ export default defineComponent({
   }),
   //生命周期函数  mounted() 在实例挂载之后调用， 设置定期刷新控制台时间
   mounted() {
-    console.log(this.systemConfig.naviList)
     if (this.timer) {
       clearInterval(this.timer);
     } else {
@@ -143,13 +143,20 @@ export default defineComponent({
       store.systemConfig.showLeftMeun
     ) {
       if (store.userInfo.roles == "ROLE_STUDENT") {
-        router.push({ path: "/StudentIntroduce" });
+        router.push({ path: "/StudentMainPage" });
+        const res = getStudentInfo(store.$state.userInfo.id - 1);
+
+      }
+      else if (store.userInfo.roles == "ROLE_TEACHER") {
+        router.push({ path: "/TeacherMainPage" });
       }
       else router.push({ path: "/MainPage" });
     } else {
       router.push({ path: "/Login" });
     }
+
   },
+
   // 生命周期函数  unmounted() 在实例销毁之后调用，清除定期刷新控制台时间
   unmounted() {
     clearInterval(this.timer);
@@ -162,7 +169,7 @@ export default defineComponent({
   methods: {
     handleCommand(command) {
       if (command === "profile") {
-        router.push({ path: "/StudentIntroduce" });
+        router.push({ path: "/StudentMainPage" });
       } else if (command === "changePassword") {
         router.push({ path: "/Password" });
       } else if (command === "logout") {

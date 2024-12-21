@@ -9,6 +9,7 @@ import org.fatmansoft.teach.payload.response.OptionItem;
 import org.fatmansoft.teach.payload.response.OptionItemList;
 import org.fatmansoft.teach.repository.*;
 import org.fatmansoft.teach.service.BaseService;
+import org.fatmansoft.teach.service.StudentService;
 import org.fatmansoft.teach.util.ComDataUtil;
 import org.fatmansoft.teach.util.CommonMethod;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,14 @@ public class BaseController {
     private BaseService baseService;  //基本数据处理数据操作自动注入
     @Autowired
     private UserTypeRepository userTypeRepository;   //用户类型数据操作自动注入
-
+    @Autowired
+    private PersonRepository personRepository;  //人员数据操作自动注入
+    @Autowired
+    private StudentRepository studentRepository;  //学生数据操作自动注入
+    @Autowired
+    private TeacherRepository teacherRepository;  //教师数据操作自动注入
+    @Autowired
+    private StudentService studentService;  //学生服务自动注入
 
     /**
      *  获取menu表的新的Id StringBoot 对SqLite 主键自增支持不好  插入记录是需要设置主键ID，编写方法获取新的menu_id
@@ -65,6 +73,30 @@ public class BaseController {
      *
      * @return
      */
+
+    @PostMapping("/getByUsername")
+    public DataResponse getPersonByUserId( @RequestBody DataRequest dataRequest) {
+        String username = dataRequest.getString("username");
+        System.out.println("username = " + username);
+        Optional<User> op = userRepository.findByUserName(username);
+        Person p=personRepository.findPersonByNum(username);
+        if (op.isPresent()) {
+            if(op.get().getUserType().getId()==2 )
+            {
+                Student s=studentRepository.findByPersonPersonId(p.getPersonId()).get();
+
+                System.out.println(s);
+                return new DataResponse(0,studentService.getMapFromStudent(s),null);
+            }
+            else if(op.get().getUserType().getId()==3)
+            {
+                Teacher t=teacherRepository.getTeacherByPerson(p);
+                return new DataResponse(0, t,null);
+            }
+        }
+        return CommonMethod.getReturnMessageError("用户不存在！");
+    }
+
 
     /**
      * 获取菜单列表

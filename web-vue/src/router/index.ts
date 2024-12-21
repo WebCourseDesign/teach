@@ -1,4 +1,5 @@
 // Composables
+import path from "path";
 import { createRouter, createWebHistory } from "vue-router";
 //路由表
 const routes = [
@@ -29,20 +30,25 @@ const routes = [
     name: "Password",
     component: () => import("~/views/info/Password.vue"),
   },
-  /* {
-    path: "/StudentIntroduce",
-    name: "StudentIntroduce",
-    component: () => import("~/views/info/StudentIntroduce.vue"),
-  }, */
   {
     path: "/StudentIntroduce",
     name: "StudentIntroduce",
+    component: () => import("~/views/info/StudentIntroduce.vue"),
+  },
+  {
+    path: "/StudentMainPage",
+    name: "StudentMainPage",
     component: () => import("~/views/info/StudentMainPage.vue"),
   },
   {
     path: "/TeacherIntroduce",
     name: "TeacherIntroduce",
     component: () => import("~/views/info/TeacherIntroduce.vue"),
+  },
+  {
+    path: "/TeacherMainPage",
+    name: "TeacherMainPage",
+    component: () => import("~/views/info/TeacherMainPage.vue"),
   },
   {
     path: "/menu-manage-panel",

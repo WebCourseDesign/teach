@@ -1,6 +1,7 @@
 package org.fatmansoft.teach.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 import lombok.ToString;
 
 import javax.persistence.*;
@@ -19,6 +20,7 @@ import javax.validation.constraints.Size;
         uniqueConstraints = {
         })
 @ToString
+@Data
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

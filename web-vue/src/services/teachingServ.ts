@@ -280,7 +280,6 @@ export async function getPendingCourses(): Promise<DataResponse> {
   return res as DataResponse;
 }
 
-export const getHomeworkList = async () => {
-  const res = await axios.get('/api/teaching/homework/list')
-  return res.data.data
-}
+/* export async function getPendingCourses() {
+  return await request('/api/course/getPendingCourses', null)
+} */

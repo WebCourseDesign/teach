@@ -1,5 +1,7 @@
 import axios, { type RawAxiosRequestHeaders } from "axios";
 import { useAppStore } from "~/stores/app";
+
+
 //一般数据请求函数，参数为url后台接口映射全路径，和data 为传递后台的数据，返回值为服务器返回的data
 export async function generalRequest(
   url: string,
@@ -50,7 +52,7 @@ export function getAuthHeaderFile(): RawAxiosRequestHeaders {
 //文件下载函数，参数为url后台接口映射全路径，和label 为下载文件的名称，和data 为传递后台的数据，返回值为服务器返回的data
 export async function downloadPost(url: string, label: string, data: any) {
   console.log(data);
-  
+
   const requestOptions = {
     method: "POST",
     headers: {
@@ -65,7 +67,7 @@ export async function downloadPost(url: string, label: string, data: any) {
     .then(async (response) => {
       const blob = await response.blob();
       console.log(blob);
-      
+
 
       // check for error response
       if (!response.ok) {

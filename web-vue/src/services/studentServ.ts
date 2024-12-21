@@ -52,8 +52,3 @@ export const getStudentById = (id) => {
         method: "get",
     })
 }
-
-export const getStudentHomeworkList = async () => {
-    const res = await axios.get('/api/student/homework/list')
-    return res.data.data
-}

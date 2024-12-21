@@ -174,7 +174,7 @@ public class StudentController {
      */
 
     @PostMapping("/getStudentInfo")
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public DataResponse getStudentInfo(@Valid @RequestBody DataRequest dataRequest) {
         Integer studentId = dataRequest.getInteger("studentId");
         Student s = null;

@@ -15,6 +15,4 @@ public interface TeacherRepository extends JpaRepository<Teacher,Integer> {
 
     Teacher getTeacherByPerson(Person person);
 
-
-
 }

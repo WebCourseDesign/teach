@@ -522,7 +522,10 @@ export default defineComponent({
             store.removeAccount();
           }
           if (store.userInfo.roles == "ROLE_STUDENT") {
-            router.push({ path: "/StudentIntroduce" });
+            router.push({ path: "/StudentMainPage" });
+          }
+          else if (store.userInfo.roles == "ROLE_TEACHER") {
+            router.push({ path: "/TeacherMainPage" });
           }
           else router.push({ path: "/MainPage" });
           //router.push({ path: "/MainPage" });
