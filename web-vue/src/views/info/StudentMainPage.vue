@@ -70,7 +70,10 @@
                 </div>
             </el-card>
 
-            <!-- 快速入口 -->
+
+        </div>
+        <!-- 快速入口 -->
+        <div class="dashboard-container">
             <el-card class="quick-access">
                 <template #header>
                     <div class="card-header">
@@ -80,10 +83,11 @@
                 <div class="button-group">
                     <el-button type="primary" @click="$router.push('/score-table-panel')">成绩查询</el-button>
                     <el-button type="success" @click="$router.push('/select-course-panel')">选课系统</el-button>
-                    <el-button type="warning" @click="$router.push('/student-introduce')">个人画像</el-button>
+                    <el-button type="warning" @click="$router.push('/StudentIntroduce')">个人画像</el-button>
                 </div>
             </el-card>
         </div>
+
     </div>
 </template>
 
@@ -166,11 +170,11 @@ onMounted(async () => {
 
         // 获取近期作业
         const taskRes = await getTaskByStudent()
-        recentTasks.value = taskRes.data.data.slice(0, 3) // 只显示最近3个作业
+        recentTasks.value = taskRes.data.data.slice(0, 2) // 只显示最近2个作业
 
         // 获取请假记录
         const absenceRes = await getAbsenceList()
-        absenceList.value = absenceRes.slice(0, 3) // 只显示最近3条记录
+        absenceList.value = absenceRes.slice(0, 2) // 只显示最近2条记录
     } catch (error) {
         console.error('Error loading student dashboard:', error)
     }
@@ -188,12 +192,12 @@ onMounted(async () => {
 .info-card,
 .task-card,
 .absence-card {
-    height: fit-content;
+    height: inherit;
+
 }
 
 .quick-access {
     height: fit-content;
-    width: fit-content;
 }
 
 .student-info {
