@@ -156,6 +156,7 @@ public class ScoreController {
     @PostMapping("/selectCourse")
     public DataResponse selectCourse(@RequestBody List<String> courseIdList) {
         try {
+            courseIdList=List.of(courseIdList.get(courseIdList.size()-1));
             if (courseIdList != null && !courseIdList.isEmpty()) {
                 System.out.println("courseIdList = " + courseIdList);
                 HashSet<String> courseIdSet = new HashSet<>(courseIdList);
@@ -178,6 +179,15 @@ public class ScoreController {
                             for (String courseids : courseIdSet) {
                                 Integer courseId = Integer.valueOf(courseids);
                                 List<Integer> finalSelectedStudents = selectedStudents;
+
+                                Course preCourse = courseRepository.findById(courseId).get().getPreCourse();
+                                Integer preCourseId = preCourse == null ? 0 : preCourse.getCourseId();
+                                if (preCourseId != 0) {
+                                    List<Score> byStudentCourse = scoreRepository.findByStudentCourse(student.getStudentId(), preCourseId);
+                                    if (byStudentCourse.isEmpty()) {
+                                        throw new ServiceException("请先修完 " + preCourse.getName());
+                                    }
+                                }
 
                                 // 找出实际已经选上（在数据库而不是缓存中）的学生并添加到finalSelectedStudents中
                                 List<Integer> selectedStudentIds = scoreRepository.findByCourseCourseId(courseId)

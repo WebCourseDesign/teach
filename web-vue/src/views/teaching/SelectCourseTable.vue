@@ -171,6 +171,8 @@ const submitList = () => {
     selectCourse.value.forEach(element => {
         let array = []
         array.push(...element)
+        console.log(array);
+
         submitSelectCourse(array).then((res) => {
             if (res.data.code != 0) {
                 ElMessage.error(res.data.msg)
