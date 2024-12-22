@@ -111,6 +111,7 @@ import { OptionItem } from '~/models/general'
 import { Innovation } from '~/models/Innovation'
 import { getInnovationList, addAndEditInnovation, deleteInnovation } from '~/services/innovationServ'
 import { getStudentItemOptionList } from '~/services/teachingServ'
+import {cloneDeep} from "lodash";
 const dialogVisible = ref(false)
 const studentList = ref<OptionItem[]>([])
 const studentId = ref('')
@@ -182,7 +183,8 @@ const addItem = () => {
 
 const editType = ref(false)
 const editItem = (item: Innovation) => {
-    editedItem.value = item
+
+    editedItem.value = cloneDeep(item)
     editType.value = true
     dialogVisible.value = true
 }
