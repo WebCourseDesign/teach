@@ -215,11 +215,15 @@ const editItem = (item: Task) => {
     dialogVisible.value = true
 }
 const confirm = () => {
+  const selectedDate = new Date(editedItem.value.overTime);
+  if(selectedDate< new Date()){
+    ElMessageBox.alert('过期时间不能小于当天')
+    return
+  }
     if (editedItem.value.course.courseId == '' || editedItem.value.overTime == '' || editedItem.value.taskName == '' || editedItem.value.taskNo == '' || editedItem.value.taskPath == '') {
         ElMessageBox.alert('请填写完整信息')
         return
     }
-
     addAndEditTask(editedItem.value).then(res => {
         console.log(res)
         dialogVisible.value = false
