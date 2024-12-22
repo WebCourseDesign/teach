@@ -35,14 +35,14 @@
                 <el-table-column label="操作">
                     <template #default="scope">
                         <el-button-group>
-                            <el-button @click="editItem(scope.row)" type="success" v-if="appStore.$state.userInfo.roles.includes('ROLE_TEACHER')">编辑</el-button>
-                            <el-button @click="toCorrecting()" type="warning" v-if="appStore.$state.userInfo.roles.includes('ROLE_TEACHER') && scope.row.state != 0">批改</el-button>
+                            <el-button @click="editItem(scope.row)" type="success"
+                                v-if="appStore.$state.userInfo.roles.includes('ROLE_TEACHER')">编辑</el-button>
+                            <el-button @click="toCorrecting()" type="warning"
+                                v-if="appStore.$state.userInfo.roles.includes('ROLE_TEACHER') && scope.row.state != 0">批改</el-button>
                             <el-upload :headers="authToken"
-
-                                :action="'http://202.194.7.29:22222/api/task/upload/' + scope.row.taskId"
+                                :action="'http://202.194.14.120:22222/api/task/upload/' + scope.row.taskId"
                                 v-if="appStore.$state.userInfo.roles.includes('ROLE_STUDENT') && scope.row.state != 3"
-                                :on-success="getPublicTask"
-                                :accept="'application/pdf'">
+                                :on-success="getPublicTask" :accept="'application/pdf'">
                                 <template #trigger>
                                     <el-button type="primary">select file</el-button>
                                 </template>
@@ -54,7 +54,8 @@
 
         </div>
         <!-- 这里是历史作业记录和成绩 -->
-        <div style="display: flex; justify-content: center; margin-top: 10px;" v-if="appStore.$state.userInfo.roles.includes('ROLE_STUDENT')">
+        <div style="display: flex; justify-content: center; margin-top: 10px;"
+            v-if="appStore.$state.userInfo.roles.includes('ROLE_STUDENT')">
 
             <h2>历史作业记录</h2>
         </div>
@@ -119,7 +120,7 @@
 
 </template>
 <script lang="ts" setup>
-import {ElMessage, ElMessageBox} from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useAppStore } from '~/stores/app'
 import { OptionItem } from '~/models/general'
@@ -130,6 +131,7 @@ import { addAndEditTask, getTaskByStudent, getTasksByTeacher } from '../../servi
 import { getCourseByTeacher } from '../../services/teachingServ';
 import { useRouter } from 'vue-router'
 import { getHistoryTaskSubmit } from '~/services/taskSubmitServ'
+import { cloneDeep } from 'lodash';
 const dialogVisible = ref(false)
 const studentList = ref<OptionItem[]>([])
 const courseList = ref<Course[]>([])
@@ -138,7 +140,7 @@ const taskList = ref([])
 const historyList = ref<TaskSubmit[]>([])
 const courseId = ref('')
 const authToken = ref({
-    Authorization:''
+    Authorization: ''
 })
 const editedItem = ref<Task>({
     taskId: 0,
@@ -209,11 +211,11 @@ const addItem = () => {
 }
 
 const editItem = (item: Task) => {
-    editedItem.value = item
+    editedItem.value = cloneDeep(item)
     dialogVisible.value = true
 }
 const confirm = () => {
-    if(editedItem.value.course.courseId==''||editedItem.value.overTime==''||editedItem.value.taskName==''||editedItem.value.taskNo==''||editedItem.value.taskPath==''){
+    if (editedItem.value.course.courseId == '' || editedItem.value.overTime == '' || editedItem.value.taskName == '' || editedItem.value.taskNo == '' || editedItem.value.taskPath == '') {
         ElMessageBox.alert('请填写完整信息')
         return
     }

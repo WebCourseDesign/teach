@@ -84,6 +84,10 @@
                     <el-button type="primary" @click="$router.push('/score-table-panel')">成绩查询</el-button>
                     <el-button type="success" @click="$router.push('/select-course-panel')">选课系统</el-button>
                     <el-button type="warning" @click="$router.push('/StudentIntroduce')">个人画像</el-button>
+                    <el-button type="danger" @click="$router.push('/daily-activity-panel')">日常活动管理</el-button>
+                    <el-button type="primary" @click="$router.push('/honor-panel')">荣誉管理</el-button>
+                    <el-button type="success" @click="$router.push('/innovation-panel')">创新实践管理</el-button>
+                    <el-button type="warning" @click="$router.push('/absence-panel')">考勤管理</el-button>
                 </div>
             </el-card>
         </div>

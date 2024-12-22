@@ -22,6 +22,7 @@
 
                     <el-form-item>
                         <el-button type="default" class="commButton" @click="query()">查询</el-button>
+                      <el-button type="default" class="commButton" @click="reset()">重置</el-button>
                     </el-form-item>
                 </el-form>
 
@@ -201,6 +202,12 @@ const query = () => {
 
     })
 }
+
+const reset = () => {
+    studentId.value = ''
+    getList()
+}
+
 const deleteItem = (id) => {
 
     deleteDailyAct(id).then(res => {

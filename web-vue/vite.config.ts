@@ -88,12 +88,12 @@ export default defineConfig({
     port: 3000,
     proxy: {
       "/api": {
-        target: "http://localhost:22222",
-        //target: "http://202.194.14.120:22222",
+        //target: "http://localhost:22222",
+        target: "http://202.194.14.120:22222",
       },
       "/auth": {
-        target: "http://localhost:22222",
-        //target: "http://202.194.14.120:22222",
+        //target: "http://localhost:22222",
+        target: "http://202.194.14.120:22222",
       },
     },
   },

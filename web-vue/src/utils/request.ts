@@ -1,8 +1,8 @@
 import axios from 'axios'
 import { useAppStore } from '~/stores/app'
 const request = axios.create({
-  baseURL: "http://localhost:22222/",
-  //baseURL: "http://202.194.7.29:22222",
+  //baseURL: "http://localhost:22222/",
+  baseURL: "http://202.194.7.29:22222",
   timeout: 5000
 }
 )

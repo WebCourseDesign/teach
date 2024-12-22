@@ -177,7 +177,7 @@ public class CourseController {
     @PreAuthorize("hasRole('ADMIN')")
     public DataResponse changeCourseState(){
         Integer state = (Integer) caffeineCache.asMap().get("selectCourse");
-        if (state == 0){
+        if (state==null||state == 0){
             return startSelectCourse();
         }
         if (state == 1){

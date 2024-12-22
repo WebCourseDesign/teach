@@ -1,0 +1,1 @@
+import{r as t}from"./request-9dd860e1.js";const a=()=>t({url:"/api/task/getTasksByTeacher",method:"get"}),s=a=>t({url:"/api/task/task",method:"post",data:a}),e=()=>t({url:"/api/task/getTasksByStudent",method:"get"});export{a,s as b,e as g};

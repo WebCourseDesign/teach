@@ -46,8 +46,14 @@
           <el-input v-model="form.person.address" placeholder="地址" />
         </el-form-item>
       </el-form>
-      <el-button class="commButton" @click="submit" type="primary">提交</el-button>
-      <el-button class="commButton" @click="cancel" type="default">返回</el-button>
+      <el-form style="display: flex; justify-content: center;">
+        <el-form-item>
+          <el-button class="commButton" @click="submit" type="primary">提交</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button class="commButton" @click="cancel" type="default">返回</el-button>
+        </el-form-item>
+      </el-form>
       <!-- <table class="content">
         <tr>
           <td colspan="1" style="text-align: right">工号</td>

@@ -1,0 +1,1 @@
+import{r as a}from"./request-9dd860e1.js";import{M as s}from"./index-be5cb234.js";const e=async a=>(await s("/api/absence/list",{studentId:a})).data,t=s=>a({url:"/api/absence",method:"post",data:s}),o=s=>a({url:"/api/absence/approve",method:"post",data:s}),d=s=>a({url:"/api/absence/disagree",method:"post",data:s});export{o as a,t as b,d,e as g};

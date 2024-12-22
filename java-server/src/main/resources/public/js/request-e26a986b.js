@@ -1,1 +1,0 @@
-import{a7 as e,u as t}from"./index-7ed7b84e.js";const r=e.create({baseURL:"http://202.194.7.29:22222",timeout:5e3});r.interceptors.request.use((e=>(e.headers.Authorization=`Bearer ${t().userInfo.jwtToken}`,e)));const s=r;export{s as r};

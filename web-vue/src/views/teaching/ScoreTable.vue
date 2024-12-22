@@ -1,206 +1,130 @@
 <template>
-  <div class="base_form">
-    <div class="base_header">
-      <div class="blue_column"></div>
-      <div class="base_title">成绩管理</div>
+  <div class="score-management">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="blue-bar"></div>
+      <h2 class="page-title">成绩管理</h2>
     </div>
 
-    <div class="base_query_oneLine">
-      <div class="query_left">
-        <el-button class="commButton" type="primary" @click="addItem()">添加</el-button>
+    <!-- Control Panel -->
+    <div class="control-panel">
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+
       </div>
-      <div class="query_right">
-        <el-form :inline="true">
-          <el-form-item label="学生">
-            <el-select v-model="studentId">
-              <el-option v-for="item in studentList" :label="item.title" :key="item.id" :value="item.id"></el-option>
+
+      <!-- Search Form -->
+      <div class="search-form">
+        <el-form :inline="true" @submit.prevent="query">
+          <el-form-item>
+            <el-button type="primary" @click="addItem()"
+              v-if="!appStore.$state.userInfo.roles.includes('ROLE_STUDENT')">
+              添加成绩
+            </el-button>
+          </el-form-item>
+          <el-form-item label="学生" v-if="!appStore.$state.userInfo.roles.includes('ROLE_STUDENT')">
+            <el-select v-model="studentId" placeholder="选择学生" clearable style="min-width: 150px;">
+              <el-option v-for="item in studentList" :label="item.title" :key="item.id" :value="item.id" />
             </el-select>
           </el-form-item>
           <el-form-item label="课程">
-            <el-select v-model="courseId">
-              <el-option v-for="item in courseList" :label="item.title" :key="item.id" :value="item.id"></el-option>
+            <el-select v-model="courseId" placeholder="选择课程" clearable style="min-width: 150px;">
+              <el-option v-for="item in courseList" :label="item.title" :key="item.id" :value="item.id" />
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="default" class="commButton" @click="query()">查询</el-button>
+            <el-button-group>
+              <el-button type="primary" @click="query">
+                查询
+              </el-button>
+              <el-button @click="reset">
+                重置
+              </el-button>
+            </el-button-group>
           </el-form-item>
         </el-form>
-        <!-- <span style="margin-top: 5px">学生</span>
-        <select class="commInput" v-model="studentId">
-          <option value="0">请选择...</option>
-          <option v-for="item in studentList" :key="item.id" :value="item.id">
-            {{ item.title }}
-          </option>
-        </select>
-        <span style="margin-top: 5px">课程</span>
-        <select class="commInput" v-model="courseId">
-          <option value="0">请选择...</option>
-          <option v-for="item in courseList" :key="item.id" :value="item.id">
-            {{ item.title }}
-          </option>
-        </select>
-        <button style="margin-left: 5px" class="commButton" @click="query()">
-          查询
-        </button> -->
       </div>
     </div>
-    <div class="table_center" style="margin-top: 5px">
-      <el-table :data="scoreList">
-        <el-table-column label="学号" prop="studentNum" />
-        <el-table-column label="姓名" prop="studentName" />
-        <el-table-column label="班级" prop="className" />
-        <el-table-column label="课程号" prop="courseNum" />
-        <el-table-column label="课程名" prop="courseName" />
-        <el-table-column label="学分" prop="credit" />
-        <el-table-column label="成绩">
-          <template #default="scope">
-            {{ scope.row.mark == "null" ? '未打分' : scope.row.mark }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作">
-          <template #default="scope">
-            <el-button-group>
-              <el-button @click="editItem(scope.row)" type="success">编辑</el-button>
-              <el-button @click="deleteItem(scope.row.scoreId)" type="danger">删除</el-button>
-            </el-button-group>
-          </template>
-        </el-table-column>
-      </el-table>
-      <!-- <table class="content">
-        <tr class="table_th">
-          <td>学号</td>
-          <td>姓名</td>
-          <td>班级</td>
-          <td>课程号</td>
-          <td>课程名</td>
-          <td>学分</td>
-          <td>成绩</td>
-          <td>操作</td>
-        </tr>
-        <tr v-for="item in scoreList" :key="item.scoreId">
-          <td>{{ item.studentNum }}</td>
-          <td>{{ item.studentName }}</td>
-          <td>{{ item.className }}</td>
-          <td>{{ item.courseNum }}</td>
-          <td>{{ item.courseName }}</td>
-          <td>{{ item.credit }}</td>
-          <td>{{ item.mark }}</td>
-          <td>
-            <button class="table_edit_button" @click="editItem(item)">
-              编辑
-            </button>
-            <button
-              class="table_delete_button"
-              @click="deleteItem(item.scoreId)"
-            >
-              删除
-            </button>
-          </td>
-        </tr>
-      </table> -->
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Radar Chart for Students -->
+      <el-row :gutter="20">
+        <el-col :span="appStore.$state.userInfo.roles.includes('ROLE_STUDENT') ? 8 : 0"
+          v-if="appStore.$state.userInfo.roles.includes('ROLE_STUDENT')">
+          <el-card class="chart-card">
+            <template #header>
+              <div class="card-header">
+                <span>成绩分析</span>
+              </div>
+            </template>
+            <div id="scoreRadarChart" class="radar-chart"></div>
+          </el-card>
+        </el-col>
+
+        <!-- Score Table -->
+        <el-col :span="appStore.$state.userInfo.roles.includes('ROLE_STUDENT') ? 16 : 24">
+          <el-card class="table-card">
+            <el-table :data="scoreList" stripe border>
+              <el-table-column label="学号" prop="studentNum"
+                v-if="!appStore.$state.userInfo.roles.includes('ROLE_STUDENT')" />
+              <el-table-column label="姓名" prop="studentName"
+                v-if="!appStore.$state.userInfo.roles.includes('ROLE_STUDENT')" />
+              <el-table-column label="班级" prop="className"
+                v-if="!appStore.$state.userInfo.roles.includes('ROLE_STUDENT')" />
+              <el-table-column label="课程号" prop="courseNum" />
+              <el-table-column label="课程名" prop="courseName" />
+              <el-table-column label="学分" prop="credit" />
+              <el-table-column label="成绩">
+                <template #default="scope">
+                  {{ scope.row.mark == "null" ? '未打分' : scope.row.mark }}
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" v-if="!appStore.$state.userInfo.roles.includes('ROLE_STUDENT')">
+                <template #default="scope">
+                  <el-button-group>
+                    <el-button @click="editItem(scope.row)" type="success">编辑</el-button>
+                    <el-button @click="deleteItem(scope.row.scoreId)" type="danger">删除</el-button>
+                  </el-button-group>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-card>
+        </el-col>
+      </el-row>
     </div>
+
+    <!-- Dialog Form -->
+    <el-dialog v-model="dialogVisible" :title="editedItem.scoreId ? '修改成绩' : '添加成绩'" width="500px" destroy-on-close>
+      <el-form :model="editedItem" label-position="right" label-width="100px" :rules="rules" ref="form">
+        <el-form-item label="学生">
+          <el-select v-model="editedItem.studentId" placeholder="请选择...">
+            <el-option v-for="item in studentList" :label="item.title" :value="item.value"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="课程名">
+          <el-select v-model="editedItem.courseId" placeholder="请选择...">
+            <el-option v-for="item in courseList" :label="item.title" :value="item.value"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="成绩" prop="mark"
+          :rules="[{ required: true, message: '成绩从0-100', trigger: 'blur', validator: checkMark }]">
+          <el-input v-model.number="editedItem.mark" style="width: 100%;"></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="confirm">确认</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
-  <!-- 成绩修改对话框显示 -->
-  <el-dialog id="favDialog" v-model="dialogVisible" :before-close="handleClose" width="400px">
-    <template #header>
-      <h1>成绩添加修改对话框</h1>
-    </template>
-    <!-- <div class="base_title">成绩添加修改对话框</div> -->
-    <!-- <div class="dialog-div" style="margin-top: 5px"> -->
-    <el-form label-width="80px" :model="editedItem" ref="form">
-      <el-form-item label="学生">
-        <el-select v-model="editedItem.studentId" placeholder="请选择...">
-          <el-option v-for="item in studentList" :label="item.title" :value="item.value"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="课程名">
-        <el-select v-model="editedItem.courseId" placeholder="请选择...">
-          <el-option v-for="item in courseList" :label="item.title" :value="item.value"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="成绩" prop="mark"
-        :rules="[{ required: true, message: '成绩从0-100', trigger: 'blur', validator: checkMark }]">
-        <el-input v-model.number="editedItem.mark" style="width: 100%;"></el-input>
-      </el-form-item>
-      <!-- <el-form-item>
-        <el-button @click="handleClose" style="margin-right: 30px">取消</el-button>
-        <el-button type="primary" @click="confirm">确认</el-button>
-      </el-form-item> -->
-    </el-form>
-    <div style="display: flex; justify-content: center; margin-top: 10px">
-      <el-button type="primary" @click="confirm">确认</el-button>
-      <el-button @click="close">取消</el-button>
-    </div>
-    <!-- </div> -->
-  </el-dialog>
-  <!-- <dialog
-    id="favDialog"
-    onclose="close()"
-    style="
-      position: absolute;
-      top: 300px;
-      left: 300px;
-      width: 300px;
-      height: 210px;
-    "
-  >
-    <div class="base_title">成绩添加修改对话框</div>
-    <div class="dialog-div" style="margin-top: 5px">
-      <table class="dialog-content">
-        <tr>
-          <td colspan="1" style="text-align: right">课程号</td>
-          <td colspan="1">
-            <select class="commInput" v-model="editedItem.studentId">
-              <option value="0">请选择...</option>
-              <option
-                v-for="item in studentList"
-                :key="item.id"
-                :value="item.id"
-              >
-                {{ item.title }}
-              </option>
-            </select>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="1" style="text-align: right">课程名</td>
-          <td colspan="1">
-            <select class="commInput" v-model="editedItem.courseId">
-              <option value="0">请选择...</option>
-              <option
-                v-for="item in courseList"
-                :key="item.id"
-                :value="item.id"
-              >
-                {{ item.title }}
-              </option>
-            </select>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="1" style="text-align: right">成绩</td>
-          <td colspan="1">
-            <input v-model="editedItem.mark" class="commInput" />
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <button
-              class="commButton"
-              @click="close()"
-              style="margin-right: 30px"
-            >
-              取消
-            </button>
-            <button class="commButton" @click="confirm()">确认</button>
-          </td>
-        </tr>
-      </table>
-    </div>
-  </dialog> -->
 </template>
+
 <script lang="ts">
 import { defineComponent } from "vue";
+import * as echarts from "echarts";
 import {
   getScoreList,
   getStudentItemOptionList,
@@ -217,6 +141,8 @@ import { cloneDeep } from 'lodash';
 import { mapState } from "pinia";
 import { useAppStore } from "~/stores/app";
 import { getTeacherByNum, getTeacherInfo } from "~/services/personServ";
+import { generalRequest } from "~/services/genServ";
+import { getPhotoImageStr } from "~/services/infoServ";
 export default defineComponent({
   data: () => ({
     scoreList: [] as ScoreItem[],
@@ -228,10 +154,23 @@ export default defineComponent({
     courseList: [] as OptionItem[],
     deleteId: -1,
     dialogVisible: false,
+    appStore: useAppStore(),
+    radarChart: null as any,
+    gpa: 0
   }),
   computed: {},
-  created() {
+  async created() {
     this.initialize();
+
+    if (this.appStore.$state.userInfo.roles == "ROLE_STUDENT") {
+      const studentRes = await generalRequest("/api/base/getByUsername", {
+        username: this.appStore.$state.userInfo.username,
+      })
+      this.studentId = studentRes.data.studentId;
+      console.log(this.studentId);
+      this.query();
+
+    }
   },
 
   methods: {
@@ -258,6 +197,16 @@ export default defineComponent({
     // 查询
     async query() {
       this.scoreList = await getScoreList(this.studentId, this.courseId);
+      if (this.appStore.$state.userInfo.roles.includes('ROLE_STUDENT')) {
+        this.drawRadarChart();
+      }
+    },
+
+    // 重置
+    reset() {
+      if (this.appStore.$state.userInfo.roles !== "ROLE_STUDENT") this.studentId = null;
+      this.courseId = null;
+      this.query();
     },
 
     checkMark() {
@@ -329,6 +278,172 @@ export default defineComponent({
         message(this, res.msg);
       }
     },
+    drawRadarChart() {
+      if (this.radarChart) {
+        this.radarChart.dispose();
+      }
+
+      const chartDom = document.getElementById('scoreRadarChart');
+      if (!chartDom) return;
+
+      this.radarChart = echarts.init(chartDom);
+
+      const indicators = this.scoreList.map(score => ({
+        name: score.courseName,
+        max: 100
+      }));
+
+      const data = this.scoreList.map(score =>
+        score.mark === 'null' ? 0 : parseFloat(score.mark)
+      );
+
+      const option = {
+        tooltip: {
+          trigger: 'item'
+        },
+        legend: {
+          data: ['成绩分布'],
+          bottom: 0
+        },
+        radar: {
+          center: ['50%', '50%'],
+          radius: '65%',
+          indicator: indicators,
+          shape: 'circle',
+          splitNumber: 5,
+          name: {
+            textStyle: {
+              color: '#333',
+              fontSize: 12
+            }
+          },
+          splitLine: {
+            lineStyle: {
+              color: [
+                'rgba(238, 197, 102, 0.1)', 'rgba(238, 197, 102, 0.2)',
+                'rgba(238, 197, 102, 0.4)', 'rgba(238, 197, 102, 0.6)',
+                'rgba(238, 197, 102, 0.8)', 'rgba(238, 197, 102, 1)'
+              ].reverse()
+            }
+          },
+          splitArea: {
+            show: false
+          },
+          axisLine: {
+            lineStyle: {
+              color: 'rgba(238, 197, 102, 0.5)'
+            }
+          }
+        },
+        series: [{
+          name: '成绩分布',
+          type: 'radar',
+          data: [{
+            value: data,
+            name: '成绩分布',
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: 'rgba(128, 255, 165, 0.5)' },
+                { offset: 1, color: 'rgba(1, 191, 236, 0.5)' }
+              ])
+            },
+            lineStyle: {
+              width: 2,
+              color: '#409EFF'
+            },
+            symbol: 'circle',
+            symbolSize: 6
+          }]
+        }]
+      };
+
+      this.radarChart.setOption(option);
+    },
+
+    handleResize() {
+      this.radarChart?.resize();
+    }
   },
+  mounted() {
+    window.addEventListener('resize', this.handleResize);
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.handleResize);
+  }
 });
 </script>
+
+<style scoped>
+.score-management {
+  padding: 20px;
+  background-color: #f5f7fa;
+  min-height: calc(100vh - 60px);
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.blue-bar {
+  width: 4px;
+  height: 20px;
+  background-color: #409EFF;
+  margin-right: 12px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.control-panel {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.main-content {
+  margin-top: 20px;
+}
+
+.chart-card,
+.table-card {
+  height: 100%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.radar-chart {
+  height: 400px;
+}
+
+.table-card {
+  background-color: #fff;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 20px;
+  gap: 12px;
+}
+
+@media screen and (max-width: 768px) {
+  .score-management {
+    padding: 10px;
+  }
+
+  .control-panel {
+    padding: 15px;
+  }
+
+  .el-form--inline .el-form-item {
+    margin-right: 0;
+    width: 100%;
+  }
+}
+</style>
