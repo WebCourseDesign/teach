@@ -77,7 +77,7 @@
               <el-table-column label="学分" prop="credit" />
               <el-table-column label="成绩">
                 <template #default="scope">
-                  {{ scope.row.mark == "null" ? '未打分' : scope.row.mark }}
+                  {{ scope.row.mark == null ? '未打分' : scope.row.mark }}
                 </template>
               </el-table-column>
               <el-table-column label="操作" v-if="!appStore.$state.userInfo.roles.includes('ROLE_STUDENT')">

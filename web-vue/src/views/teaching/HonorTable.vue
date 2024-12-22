@@ -103,6 +103,7 @@ import { getHonorList, addAndEditHonor, deleteHonor } from '~/services/honorServ
 import { getStudentItemOptionList } from '~/services/teachingServ'
 import { useAppStore } from '~/stores/app'
 import { ElMessageBox } from "element-plus";
+import {cloneDeep} from "lodash";
 const dialogVisible = ref(false)
 const studentList = ref<OptionItem[]>([])
 const studentId = ref('')
@@ -188,7 +189,7 @@ const addItem = () => {
     initForm()
 }
 const editItem = (item: Honor) => {
-    editedItem.value = item
+    editedItem.value = cloneDeep(item)
     dialogVisible.value = true
 }
 const confirm = () => {

@@ -28,8 +28,7 @@
               </div>
               <template #dropdown>
                 <el-dropdown-menu slot="dropdown" class="dropdown-menu">
-                  <el-dropdown-item command="profile"
-                    v-if="appStore.$state.userInfo.roles.includes('ROLE_STUDENT')">个人中心</el-dropdown-item>
+                  <el-dropdown-item command="profile">主页</el-dropdown-item>
                   <el-dropdown-item command="changePassword">修改密码</el-dropdown-item>
                   <el-dropdown-item command="logout">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
@@ -158,7 +157,7 @@ export default defineComponent({
 
         if (store.userInfo.roles == "ROLE_STUDENT") {
           router.push({ path: "/StudentMainPage" });
-          const res = getStudentInfo(store.$state.userInfo.id - 1);
+
         }
         else if (store.userInfo.roles == "ROLE_TEACHER") {
           router.push({ path: "/TeacherMainPage" });
@@ -223,7 +222,9 @@ export default defineComponent({
   methods: {
     handleCommand(command) {
       if (command === "profile") {
-        router.push({ path: "/StudentMainPage" });
+        if(this.appStore.userInfo.roles=="ROLE_STUDENT") router.push({ path: "/StudentMainPage" });
+        else if(this.appStore.userInfo.roles=="ROLE_TEACHER") router.push({ path: "/TeacherMainPage" });
+        else router.push({ path: "/MainPage" });
       } else if (command === "changePassword") {
         router.push({ path: "/Password" });
       } else if (command === "logout") {

@@ -143,13 +143,15 @@ const uploadFile = async () => {
         return
     } */
     const res = await uploadPhoto(teacherInfo.value.personId + ".jpg", file);
-    if (res.code === 0) {
-        ElMessage.success('上传成功');
-        const result = await getPhotoImageStr(teacherInfo.value.personId + ".jpg");
-        imgStr.value = result.data;
-    } else {
-        ElMessage.error('上传失败');
-    }
+    // if (res.code === 0) {
+    //     ElMessage.success('上传成功');
+    //     const result = await getPhotoImageStr(teacherInfo.value.personId + ".jpg");
+    //     imgStr.value = result.data;
+    // } else {
+    //     ElMessage.error('上传失败');
+    // }
+    if(res.code!=0)ElMessage.error('上传失败');
+    window.location.reload();
 };
 
 const handleApprove = async (absence) => {

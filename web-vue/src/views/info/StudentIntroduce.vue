@@ -253,13 +253,15 @@ export default defineComponent({
         file.files[0]
       );
 
-      if (res.code === 0) {
-        message(this, "上传成功");
-        let result = await getPhotoImageStr(this.info.personId + ".jpg");
-        this.imgStr = result.data;
-      } else {
-        message(this, "上传失败");
-      }
+      // if (res.code === 0) {
+      //   message(this, "上传成功");
+      //   let result = await getPhotoImageStr(this.info.personId + ".jpg");
+      //   this.imgStr = result.data;
+      // } else {
+      //   message(this, "上传失败");
+      // }
+      if(res.code!=0)message(this, "上传失败")
+      window.location.reload();
     },
     // 下载pdf
     downloadPdf() {

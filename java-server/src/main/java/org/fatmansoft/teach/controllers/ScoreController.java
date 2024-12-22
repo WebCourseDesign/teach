@@ -92,7 +92,7 @@ public class ScoreController {
             m.put("courseNum", s.getCourse().getNum());
             m.put("courseName", s.getCourse().getName());
             m.put("credit", "" + s.getCourse().getCredit());
-            m.put("mark", "" + s.getMark());
+            m.put("mark", s.getMark());
             dataList.add(m);
         }
         return CommonMethod.getReturnData(dataList);
@@ -124,7 +124,7 @@ public class ScoreController {
         s.setMark(mark);
         scoreRepository.save(s);
         List<Score> byStudentCourse = scoreRepository.findByStudentCourse(0, courseId);
-        byStudentCourse.sort(Comparator.comparingInt(Score::getMark).reversed());
+        byStudentCourse.sort(Comparator.comparingInt((Score sc) -> sc.getMark() == null ? Integer.MIN_VALUE : sc.getMark()).reversed());
         System.out.println("byStudentCourse = " + byStudentCourse);
         for (int i = 0; i < byStudentCourse.size(); i++) {
             byStudentCourse.get(i).setRanking(i + 1);
